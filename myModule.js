@@ -142,13 +142,29 @@ myDB.prototype.countWords = function(name){
 	if(this.datasets.indexOf(name !=-1)){
 		xs = sf(this.filename(name));
 		var dict={};
+
 		// Comprobar que la primera lin es el header y no existe object.twit probar slice 1
-		xs.slice(0).on('data', function(chunk){
+		xs.slice(1).on('data', function(chunk){
 			
 			//console.log(chunk.toString());
 			object=JSON.parse(chunk.toString().trim());
+			console.log("===================================");
 			console.log(object);
-			console.log(object.twit);
+			console.log(object.tweet);
+			console.log("++++++++++++++++++++++++++++++++++++");
+			twit = object.tweet.slice(1, -1).split(" ");
+			for(var idx in twit){
+				var word=twit[idx].toLowerCase();
+				if(dict[word]==null){
+					dict[word]=1;
+				}else{
+					dict[word]=dict[word]+1;
+				}
+
+
+			}
+			console.log(object);
+			console.log(dict);
 			console.log('----------------------------------------');
 		});
 	

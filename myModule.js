@@ -1,7 +1,6 @@
 var gb=require('glob');
 var fs=require('fs');
 var sf=require('slice-file');
-
 var events = require('events');
 var warmupEmmitter = new events.EventEmitter();
 
@@ -138,7 +137,6 @@ myDB.prototype.deleteDataset= function(name){
 
 myDB.prototype.countWords = function(name){
 	
-
 	if(this.datasets.indexOf(name !=-1)){
 		xs = sf(this.filename(name));
 		var dict={};
@@ -149,8 +147,8 @@ myDB.prototype.countWords = function(name){
 			//console.log(chunk.toString());
 			object=JSON.parse(chunk.toString().trim());
 			console.log("===================================");
-			console.log(object);
-			console.log(object.tweet);
+			//console.log(object);
+			//console.log(object.tweet);
 			console.log("++++++++++++++++++++++++++++++++++++");
 			twit = object.tweet.slice(1, -1).split(" ");
 			for(var idx in twit){
@@ -160,15 +158,14 @@ myDB.prototype.countWords = function(name){
 				}else{
 					dict[word]=dict[word]+1;
 				}
-
-
 			}
-			console.log(object);
+			//console.log(object);
 			console.log(dict);
 			console.log('----------------------------------------');
+			
 		});
-	
-
+	//console.log(dict);
+	//dict.sort(function(a,b){return b[1]-a[1]});
 	// change 
 	}else{
 		console.log('adios');

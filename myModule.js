@@ -3,19 +3,34 @@ var fs=require('fs');
 var sf=require('slice-file');
 var events = require('events');
 var warmupEmmitter = new events.EventEmitter();
+ 
 
 myDB = function(dataDir){
         this.dataDir=dataDir+"/";
         this.datasets=[];
         this.lastID=0;
         this.count={};
+	this.polaridades = {};        
+
         this.warmup();
-        
 }
 
 myDB.prototype.warmup = function(){
      var dataDir=this.dataDir
      files= gb.glob(this.dataDir+'*.json',{sync:true});
+
+
+     
+	xs=sf("polaridades.txt");
+
+	var poldict = this.polaridades;
+	xs.slice(0).on('data', function(chunk){
+	
+		word = chunk.toString().trim().split('\t')[0];
+		pol= chunk.toString().trim().split('\t')[1];
+		poldict[word]=pol;
+	});
+
 
      this.datasets=files.map(function(e){
                      return e.trim().replace(dataDir,"").replace(".json","")
@@ -44,6 +59,9 @@ myDB.prototype.warmup = function(){
                  return true;
         });
      }
+
+
+
 
      setTimeout(() => {warmupEmmitter.emit('warmup')});
      return true;
@@ -135,7 +153,7 @@ myDB.prototype.deleteDataset= function(name){
  *
  */
 
-myDB.prototype.countWords = function(name){
+myDB.prototype.countWords = function(name, limit, callback){
 	
 	if(this.datasets.indexOf(name !=-1)){
 		xs = sf(this.filename(name));
@@ -146,10 +164,8 @@ myDB.prototype.countWords = function(name){
 			
 			//console.log(chunk.toString());
 			object=JSON.parse(chunk.toString().trim());
-			console.log("===================================");
 			//console.log(object);
 			//console.log(object.tweet);
-			console.log("++++++++++++++++++++++++++++++++++++");
 			twit = object.tweet.slice(1, -1).split(" ");
 			for(var idx in twit){
 				var word=twit[idx].toLowerCase();
@@ -160,34 +176,86 @@ myDB.prototype.countWords = function(name){
 				}
 			}
 			//console.log(object);
-			console.log(dict);
-			console.log('----------------------------------------');
+			//console.log(dict);
+		}).on('end', function(){
+			ldic=[];
+			for (k in dict){ldic.push([k,dict[k]])};
+		
+			ldic.sort(function(a,b){return b[1]-a[1]});
+			//console.log(ldic);
 			
+			if(limit ===null){
+			callback(ldic);
+			}else{
+			callback(ldic.slice(0,limit));
+			}
 		});
-	//console.log(dict);
-	//dict.sort(function(a,b){return b[1]-a[1]});
-	// change 
+	
+	
 	}else{
 		console.log('adios');
+		callback([]);
 	}
 
 	
 	
 }
 
+myDB.prototype.geo = function(name, callback){
 
-//myDB.prototype.getDatasetInfo = function(name){}
-//return the first line of the filename of name
+	
+	
+	if(this.datasets.indexOf(name !=-1)){
+		xs = sf(this.filename(name));
 
-//myDB.prototype.searchDataset = function(keyword){}
+		// Comprobar que la primera lin es el header y no existe object.twit probar slice 1
+		xs.slice(1).on('data', function(chunk){
+			
+			//console.log(chunk.toString());
+			object=JSON.parse(chunk.toString().trim());
+			//console.log(object);
+			//console.log(object.tweet);
+			//
+			console.log(object.coordinates);
+			twit = object.coordinates.slice(1, -1).split(" ");
+		}).on('end', function(){
+			
+			
+			callback("llega end");
+});
 
-//myDB.prototype.countWords = function(name){}
+
+}
+
+}
+
+myDB.prototype.polaridad = function(name, callback){
+
+	var polaridades = this.polaridades;
+	
+	this.countWords(name, null, function(data){
+		
+		polaridad=0;
+
+		for(idx in data){
+                            
+			if(data[idx][0] in polaridades){
+				console.log('********');
+				polaridad+= data[idx][1]*polaridades[data[idx][0]];
+
+			}
+		}
+
+		callback(polaridad);
+	
+	}); 
+
+}
+
+
+
 
 
 exports.myDB = myDB;
 exports.warmupEmmitter = warmupEmmitter;
 
-
-// comments
-
-//print

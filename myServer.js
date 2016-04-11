@@ -85,7 +85,10 @@ app.post('/stream', function(req, res){
 			for(idx in data.statuses){
 				tweet  = data.statuses[idx];
 				console.log(tweet.text);
-
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$");
+				
+				console.log(tweet.place.bounding_box.coordinates);
+				console.log("$$$$$$$$$$$$$$$$$$$$$$$$");
 				if(tweet.coordinates===null){
 					coordenadas=null;
 				}else{
@@ -134,9 +137,9 @@ app.put('stream/:name', function(req, res){
  */
 app.get('/stream/:name/words',function(req,res){
 
-
-    DB.countWords(req.params.name, req.params.limit, function(data){
-    	
+   top= req.query.top !== undefined ? req.query.top : 10;
+	
+    DB.countWords(req.params.name, top, function(data){
     	res.send({'result':data});
 
     });
@@ -149,8 +152,12 @@ app.get('/stream/:name/words',function(req,res){
  *
  */
 app.get('/stream/:name/polaridad', function(req, res){
+	
+	DB.polaridad(req.params.name, function(data){
+		res.send({'result':data});
+	});
 
-	res.send({'result':'unknown'});
+
 });
 
 

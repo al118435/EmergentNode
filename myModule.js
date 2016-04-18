@@ -235,26 +235,27 @@ myDB.prototype.polaridad = function(name, callback){
 	
 	this.countWords(name, null, function(data){
 		
-		polaridad=0;
+		polaridad=[0,0];
 
 		for(idx in data){
                             
-			if(data[idx][0] in polaridades){
+			repeticiones= data[idx][1];
+			pal_aux = data[idx][0];
+			if(pal_aux in polaridades){
 				console.log('********');
-				polaridad+= data[idx][1]*polaridades[data[idx][0]];
+				if ( polaridades[pal_aux] > 0){
+					polaridad[0]+=repeticiones*polaridades[pal_aux];
+				}else{
+					polaridad[1]+=repeticiones*-polaridades[pal_aux];
+				}
 
 			}
 		}
-
 		callback(polaridad);
 	
 	}); 
 
 }
-
-
-
-
 
 exports.myDB = myDB;
 exports.warmupEmmitter = warmupEmmitter;

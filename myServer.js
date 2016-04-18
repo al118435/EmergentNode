@@ -84,6 +84,7 @@ app.post('/stream', function(req, res){
 
 			for(idx in data.statuses){
 				tweet  = data.statuses[idx];
+				/**
 				console.log(tweet.text);
 				console.log("$$$$$$$$$$$$$$$$$$$$$$$$");
 				
@@ -94,7 +95,8 @@ app.post('/stream', function(req, res){
 				}else{
 					coordenadas=tweet.coordinates.coordinates;
 				}
-				
+				*/
+				coordenadas=null;
 				objDataset={"id":tweet.id_str, "tweet":JSON.stringify(tweet.text), "coordinates":coordenadas}; 
 				DB.insertObject(name, objDataset);
 				

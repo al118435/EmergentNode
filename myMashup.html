@@ -1,0 +1,286 @@
+<html>
+<meta charset="UTF-8">
+<head>
+<style>
+
+body{
+	margin: 0px; 
+	text-align: center;
+}
+
+h1{
+	width:80%;
+	text-align: center;
+}
+
+button {
+    border: 1px solid black;
+    background-color: lightgray;
+    color: black;
+    border-radius: 0.5em;
+    padding: 4px;
+    margin: 3px;
+    width: 100px;
+}
+
+button#new{
+	width: 50px;
+	background-color: white;
+}
+
+table{
+	width: 910px;
+	margin-left: 30px;
+}
+
+div#streamlist{
+    width:910px;
+    height:30px;
+    background-color:purple;
+}
+
+div#form-container{
+    visibility:hidden;
+    width:500px;
+    height:50px;
+}
+
+canvas#wordcloud{
+    width:355px;
+    height:300px;
+    background-color:lightgrey;
+}
+
+canvas#polarity{
+    width:150px;
+    height:300px;
+    background-color:lightgrey;
+}
+
+div#tweets{
+    width:910px;
+    height:30px;
+    background-color:white;
+}
+	
+div#mapcanvas{
+    width:400px;
+    height:300px;
+    background-color:lightgrey;
+}
+	
+div#fotos{
+    width:910px;
+    height:150px;
+    text-align:center;
+    background-color:purple;
+	
+}
+</style>
+
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="http://timdream.org/wordcloud2.js/src/wordcloud2.js"></script>
+<script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD6hLLddlXLuJE52eCmsFbA8OGZ0eh_UO4&sensor=false"></script>
+
+<script>
+	$(document).ready(function(){
+
+	   //initial list of buttons (streams)
+	   
+	      
+	   //button for creating new streams
+	   $("#streamlist").append("<button id='NEW' width='1%'><b>+</b></button>");
+	   
+
+	   $.getJSON("http://localhost:8012/streams", function(data, status){
+	   	
+		lbuttons=[];
+		 data=data["result"];
+		  for(idx in data){
+		 	 lbuttons.push(data[idx][0]);
+		  }
+		  
+	   	   $.each(lbuttons,function(indx,data){
+				addButton(data);
+		   });
+
+		   //event for button stream class
+		   $(".stream").click(function(){
+				actionButton(this);
+		   });
+		   
+		   //event for button "NEW"
+		   $("#NEW").click(function(){
+				//make visible the form
+				$("#form-container").css({"width":"500px","height":"50px","visibility":"visible"});
+				newdata=$("#name").val("");
+		   });
+		   
+		   //event for form button
+		   $("#create").click(function(){
+				//hide the form
+				$("#form-container").css({"visibility":"hidden"});
+				newdata=$("#name").val();
+				//create new button for new stream
+				data={"name":newdata, "query":newdata};
+				$.post("http://localhost:8012/stream", data,  function(status, data){
+					addButton(newdata);
+				}, 'json');
+	 		});  	
+	   });
+	   
+	   
+	});
+
+	function addButton(data){
+		if (data.length>0){
+			newbutton="<button class='stream' id="+data+">"+data+"</button>";
+			$(newbutton).insertBefore($("#NEW")).click(function(){actionButton(this);});
+		};
+	};
+	 
+	function actionButton(data){
+	    streamname=data.getAttribute("id");
+
+	$.getJSON("http://localhost:8012/stream/"+streamname+"/words?top=5", function(data, status){
+		
+ 	    update_cloud(data["result"]);
+	});
+	    
+		
+
+	$.getJSON("http://localhost:8012/stream/"+streamname+"/polaridad", function(data, status){
+	        total=data["result"][0]  + data["result"][1];
+		polarity = {"positive":data["result"][0]/total, "negative":data["result"][1]/total};
+		update_polar(polarity);
+	});
+
+
+
+
+/**
+
+mirar geo de los tweets
+
+*/
+		
+	    marklabel=streamname+":tweet1";
+	    geoPos={marklabel:[40.0-Math.random(),-0.624207+Math.random()/10.]};
+	    update_map(geoPos);
+		
+	    update_pictures(streamname);
+	};
+
+	function update_polar(data){
+	    var canvas=document.getElementById("polarity");
+	    var contexto=canvas.getContext("2d");
+		
+ 	    //limpia canvas
+	    contexto.clearRect(0, 0, canvas.width, canvas.height);
+
+	    contexto.fillStyle="green";
+	    contexto.lineWidth=2;
+	    contexto.beginPath();
+	    contexto.rect(0,0,canvas.width,canvas.height*data["positive"],true)
+	    contexto.fill();
+		
+	    contexto.fillStyle="red";
+	    contexto.lineWidth=2;
+	    contexto.beginPath();
+	    contexto.rect(0,canvas.height*data["positive"],canvas.width,canvas.height,true)
+	    contexto.fill();
+
+	    contexto.font = "20px Courier";
+	    contexto.fillStyle="black";
+	    contexto.fillText("Polaridad",20,20);
+	};
+
+	function update_map(data){
+		var mapProp = {
+			center:new google.maps.LatLng(40.0,-0.624207),
+			zoom:7,
+			mapTypeId:google.maps.MapTypeId.ROADMAP
+	  };
+		var map=new google.maps.Map(document.getElementById("mapcanvas"),mapProp);
+		
+		$.each(data,function(key,pos){
+			mark=new google.maps.LatLng(pos[0],pos[1]);
+			var marker=new google.maps.Marker({position:mark, title:key});
+			marker.setMap(map);
+		});
+		
+		google.maps.event.addDomListener(window, 'load', update_map);
+		
+	};
+
+	function update_pictures(labels){
+		var flickerAPI = "https://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?";
+		$.getJSON( flickerAPI, {
+				tags:labels,
+				tagmode: "any",
+				format: "json"
+		}).done(function(data){
+				//clean photos area
+				$("#fotos").empty();
+		
+				$.each( data.items, function( i, item ) {
+					$( "<img>" ).attr( "src", item.media.m ).attr("height","145").appendTo( "#fotos" );
+					if ( i === 3 ) {return false;}
+				});
+				
+			})
+		
+	}
+
+	function update_cloud(data){
+	  options= { list : data }; 
+	  WordCloud(document.getElementById('wordcloud'), options);
+	};
+
+</script>
+
+<body>
+
+<h1>My Mash-up</h1>
+<!--Hidden form for creating new buttons -->
+<div id="form-container">
+	<label for="name" width="20%">New stream:</label>
+	<input id="name" width="70%" type="text" placeholder=".. stream name"/>
+	<button id="create" width="10%">Create</button>
+</div>
+
+<table cols="3">
+ <tr>
+     <td colspan="3"> 
+	<div id="streamlist"></div>
+     </td>
+ </tr>
+ <tr>
+    <td>
+         <canvas id="wordcloud"></canvas> </td>
+    <td>
+	 <canvas id="polarity"></canvas>
+
+    </td>
+    <td>
+	<div id="mapcanvas"></div>
+ </tr>
+ <tr>
+    <td colspan="3">
+        <div id="tweets"><b>Last tweets:</b>
+        	<!-- TODO: generate this part dynamically (IDs taken from id_str) -->
+        	<a href="https://twitter.com/statuses/706797165885063168" target="_blank">Tweet1</a>
+        	<a href="https://twitter.com/statuses/706797817692553216" target="_blank">Tweet2</a>
+        </div>
+    </td>
+ </tr>
+ <tr>
+    <td colspan="3">
+	<div id="fotos"></div>
+    </td>
+ </tr>
+</table>
+
+</body>
+</html>

@@ -174,7 +174,7 @@ div#fotos{
 
 	    
 
-	    marklabel=streamname+":tweet1";
+	    
 		geoPos={marklabel:[40.0-Math.random(),-0.624207+Math.random()/10.]};
 	    update_map(geoPos);
 		
@@ -206,6 +206,7 @@ div#fotos{
 	};
 
 	function update_map(data){
+		/*
 		var mapProp = {
 			center:new google.maps.LatLng(40.0,-0.624207),
 			zoom:7,
@@ -218,8 +219,30 @@ div#fotos{
 			var marker=new google.maps.Marker({position:mark, title:key});
 			marker.setMap(map);
 		});
-		
 		google.maps.event.addDomListener(window, 'load', update_map);
+		*/
+		
+		$.getJSON("http://localhost:8012/stream/"+streamname+"/geo", function(data, status){
+        
+			var mapProp = {
+				center:new google.maps.LatLng(data['result'][0],data['result'][1]),
+				zoom:7,
+				mapTypeId:google.maps.MapTypeId.ROADMAP
+	  		};
+	  		var map=new google.maps.Map(document.getElementById("mapcanvas"),mapProp);
+
+	  		$.each(data,function(key,pos){
+				mark=new google.maps.LatLng(pos[0],pos[1]);
+				var marker=new google.maps.Marker({position:mark, title:key});
+				marker.setMap(map);
+			});
+
+	  		google.maps.event.addDomListener(window, 'load', update_map);
+			
+			console.log("se ejecuta geo con: "+data);
+		});
+
+		
 		
 	};
 

@@ -66,6 +66,8 @@ app.get('/streams',function(req,res){
  * POST /stream  name y query en el body
  *
  */
+
+
 app.post('/stream', function(req, res){
 
 	if(req.body!==null){
@@ -84,7 +86,7 @@ app.post('/stream', function(req, res){
 
 			for(idx in data.statuses){
 				tweet  = data.statuses[idx];
-				/**
+				/*
 				console.log(tweet.text);
 				console.log("$$$$$$$$$$$$$$$$$$$$$$$$");
 				
@@ -96,8 +98,21 @@ app.post('/stream', function(req, res){
 					coordenadas=tweet.coordinates.coordinates;
 				}
 				*/
+				console.log("+++++++");
+				
+				
+				if (tweet.place ===null) {
+					lugar= "unknown";
+					console.log("Lugar: desconocido");
+				}else{
+					lugar = tweet.place.bounding_box.coordinates;
+					console.log("Lugar: "+tweet.place.bounding_box.coordinates);
+				}
+				console.log("+++++++");
+				
 				coordenadas=null;
-				objDataset={"id":tweet.id_str, "tweet":JSON.stringify(tweet.text), "coordinates":coordenadas}; 
+				lugar="a";
+				objDataset={"id":tweet.id_str, "tweet":JSON.stringify(tweet.text), "coordinates":coordenadas, "place":lugar}; 
 				DB.insertObject(name, objDataset);
 				
 			}
@@ -105,11 +120,10 @@ app.post('/stream', function(req, res){
 		});
 
 	
-	
+		res.send({'result':'unknown'});	
 		
 		}
 
-res.send({'result':'unknown'});
 
 });
 
@@ -180,7 +194,11 @@ app.get('/stream/:name/polaridad', function(req, res){
 */
 app.get('/stream/:name/geo', function(req, res){
 
-	res.send({'result':'unknown'});
+	DB.geo(req.params.name, function(data){
+		console.log(util.inspect(data));
+
+	});
+	res.send({'result': [40, 1]});
 });
 
 

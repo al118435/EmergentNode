@@ -206,6 +206,8 @@ myDB.prototype.geo = function(name, callback){
 	
 	
 	if(this.datasets.indexOf(name !=-1)){
+
+		
 		xs = sf(this.filename(name));
 
 		// Comprobar que la primera lin es el header y no existe object.twit probar slice 1
@@ -214,15 +216,13 @@ myDB.prototype.geo = function(name, callback){
 			//console.log(chunk.toString());
 			object=JSON.parse(chunk.toString().trim());
 			//console.log(object);
-			//console.log(object.tweet);
-			//
-			console.log(object.coordinates);
-			twit = object.coordinates.slice(1, -1).split(" ");
+			
+			//twit = object.coordinates.slice(1, -1).split(" ");
 		}).on('end', function(){
 			
 			
 			callback("llega end");
-});
+		});
 
 
 }

@@ -143,7 +143,7 @@ div#fotos{
 	function actionButton(data){
 	    streamname=data.getAttribute("id");
 
-	$.getJSON("http://localhost:8012/stream/"+streamname+"/words?top=5", function(data, status){
+	$.getJSON("http://localhost:8012/stream/"+streamname+"/words?top=20", function(data, status){
 		
  	    update_cloud(data["result"]);
 	});
@@ -158,19 +158,28 @@ div#fotos{
 
 
 
+	$.getJSON("http://localhost:8012/stream/"+streamname+"/?limit=5", function(data, status){
+        
+		var twitlist= data['result'];
+		console.log(data);
+		// Se ejecuta dos veces
+		$('#tweets').empty();
+		for (var i = 1; i <= 5; i++) {
+			$('#tweets').append('<a href="https://twitter.com/statuses/'+twitlist[i-1]+'">Tweet '+i+'</a>'+(i==5? "":" - "));
+		}
+		console.log("se ejecuta captación de twits");
+	});
 
-/**
+	
 
-mirar geo de los tweets
+	    
 
-*/
-		
 	    marklabel=streamname+":tweet1";
-	    geoPos={marklabel:[40.0-Math.random(),-0.624207+Math.random()/10.]};
+		geoPos={marklabel:[40.0-Math.random(),-0.624207+Math.random()/10.]};
 	    update_map(geoPos);
 		
 	    update_pictures(streamname);
-	};
+	}
 
 	function update_polar(data){
 	    var canvas=document.getElementById("polarity");
@@ -238,6 +247,8 @@ mirar geo de los tweets
 	  WordCloud(document.getElementById('wordcloud'), options);
 	};
 
+
+
 </script>
 
 <body>
@@ -270,8 +281,7 @@ mirar geo de los tweets
     <td colspan="3">
         <div id="tweets"><b>Last tweets:</b>
         	<!-- TODO: generate this part dynamically (IDs taken from id_str) -->
-        	<a href="https://twitter.com/statuses/706797165885063168" target="_blank">Tweet1</a>
-        	<a href="https://twitter.com/statuses/706797817692553216" target="_blank">Tweet2</a>
+        	
         </div>
     </td>
  </tr>

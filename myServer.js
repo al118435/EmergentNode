@@ -118,16 +118,26 @@ res.send({'result':'unknown'});
 /**
  * 
  *  Actualiza el stream <name> con el dataset que devuelva twitter
- *	PUT /stream/<name>
+ *	GET /stream/<name>?limit=$
  *
  */
 
-app.put('stream/:name', function(req, res){
+app.get('/stream/:name', function(req, res){
 	
+	twit.get('search/tweets.json',{q:req.params.name},function(error,data,status){
 
+		// var
+		var id_list=[];
+		//console.log(util.inspect(data));
+		
+		for (var i =0; i < req.query.limit; i++) {
+				
+			id_list.push(data.statuses[i].id_str);
+		}
 
-	// utilizar twit.get('search/tweets.json'
-	res.send({'result':'unknown'});
+		res.send({'result':id_list});
+	
+	});
 
 });
 

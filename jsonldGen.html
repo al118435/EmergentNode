@@ -1,0 +1,42 @@
+<html>
+<meta charset="UTF-8">
+<head>
+<style>
+	span{
+	    color:black;
+	    margin:5px;
+	    background-color:white;
+	    padding-left: 2px;
+	    padding-right: 2px;
+	}
+	#labelarea{
+	    margin:20px;
+	}
+
+	.object{
+	    margin:5px;
+	}
+</style>
+
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<script src="/public/jsonldGen.js"></script>
+
+</head>
+
+<body onload="addFields()">
+	<div class="container"><br>
+		<input id="query" placeholder="..tu consulta aquí">
+		    <button onclick="getBabelNetData()">Go</button>
+		<div id="labelarea">
+		</div>
+		<div id="fieldsarea">
+		</div>
+		<button onclick="getObject()">Generate JSON-LD</button><br>
+		<textarea id="jsonld" cols="50" rows="10" placeholder="..put here a JSON-LD example to extract fields..">
+		</textarea>
+	</div>
+</body>
+
+</html>

@@ -76,7 +76,6 @@ app.post('/stream', function(req, res){
 		
 
 		var name= req.body["name"];
-		console.log('--------',name,'-------------');
 		// Creamos el dataset que le enviamos por post
 		DB.createDataset(name, {'name':name});
 		

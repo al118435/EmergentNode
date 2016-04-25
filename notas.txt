@@ -1,0 +1,12 @@
+type
+https://schema.org/DataFeed
+
+context shchema.org
+
+
+id=nombre (check no repetid)
+
+
+query = descripcion 
+
+en lugar de tema, poner sameAs y buscamos el dataset babelnet

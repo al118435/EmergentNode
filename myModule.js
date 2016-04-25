@@ -220,6 +220,9 @@ myDB.prototype.geo = function(name, callback){
 			//twit = object.coordinates.slice(1, -1).split(" ");
 		}).on('end', function(){
 			
+
+			// mirar que deberia de devolver la api
+			callback();
 			
 			callback("llega end");
 		});

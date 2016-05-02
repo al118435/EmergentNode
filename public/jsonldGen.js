@@ -19,8 +19,11 @@ function drop(ev) {
 //Functions for generating JSON-LD
 
 function addFields(){
-    var fields=["context","type","topic"];
+    var fields=["id","query2", "sameAs"];
+    
     var ftag='<input class="object" type="text" ondrop="drop(event)" onndragover="allowDrop(event)" size="50" placeholder="..escribe o arrastra etiqueta.."'
+   
+    
     for(var i in fields){
         $("#fieldsarea").append('<label for="'+fields[i]+'">'+id2json(fields[i])+' </label><br>')
                     .append(ftag+" id='"+fields[i]+"'>")
@@ -32,19 +35,40 @@ function id2json(s){
     if (s=="context") return "@context";
     if (s=="id") return "@id";
     if (s=="type") return "@type";
+    if (s=="query2") return "query";
     return s;
 }
 
 function getObject(){
-    obj={};
-    fields=$(".object");
-    for(i in fields){
-        value=$("#"+fields[i].id).val();
-        if (value!==""){
+  
+   var baseURL = "http://localhost:8012/stream/";
+
+   var authorIP = "150.128.50.50";
+   var dateCreat = new Date().toJSON().slice(0,19);
+   
+    obj={"@type":"DataFeed", "author":authorIP, "dateCreated":dateCreat, "url": baseURL+$("#id").val(), "@context": "http://schema.org"};
+
+   fields=$(".object");
+   console.log("hay "+fields.length+" fields");
+    // id, query, sameas
+    
+    for(var i=0; i<fields.length; i++){  //in fields){
+
+
+       value= $("#"+fields[i].id).val();
+       console.log("----"+fields[i].id+"=>"+value+"la i vale="+i);
+        if (value!=="" && value !== undefined){
            obj[id2json(fields[i].id)]=$("#"+fields[i].id).val();
         }
-    };
-    $("#jsonld").val(JSON.stringify(obj));
+    }
+	 newdata=$("#id").val();
+	 //create new button for new stream
+	 $.post("http://localhost:8012/stream", obj,  function(status, data){
+		addButton(newdata);
+	}, 'json');
+   console.log("getObject finished");
+   console.log(obj);
+   //$("#jsonld").val(JSON.stringify(obj));
 }
 
 //Search Babelnet for URIs of topics

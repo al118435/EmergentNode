@@ -83,9 +83,11 @@ div#fotos{
 <script src="http://timdream.org/wordcloud2.js/src/wordcloud2.js"></script>
 <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD6hLLddlXLuJE52eCmsFbA8OGZ0eh_UO4&sensor=false"></script>
 
+<script src="public/jsonldGen.js"></script>
 <script>
 	$(document).ready(function(){
-
+	
+	var obj=null;
 	   //initial list of buttons (streams)
 	   
 	      
@@ -113,21 +115,20 @@ div#fotos{
 		   //event for button "NEW"
 		   $("#NEW").click(function(){
 				//make visible the form
-				$("#form-container").css({"width":"500px","height":"50px","visibility":"visible"});
+				
+				addFields();
+				//$("#form-container").css({"width":"500px","height":"50px","visibility":"visible", "display":"block"});
 				newdata=$("#name").val("");
+				$("#btnGenerator").css({"display":"block"});
+				
+				
+
 		   });
 		   
 		   //event for form button
-		   $("#create").click(function(){
-				//hide the form
-				$("#form-container").css({"visibility":"hidden"});
-				newdata=$("#name").val();
-				//create new button for new stream
-				data={"name":newdata, "query":newdata};
-				$.post("http://localhost:8012/stream", data,  function(status, data){
-					addButton(newdata);
-				}, 'json');
-	 		});  	
+
+		   
+		  
 	   });
 	   
 	   
@@ -141,8 +142,14 @@ div#fotos{
 	};
 	 
 	function actionButton(data){
-	    streamname=data.getAttribute("id");
+	
+	
+	
+	streamname=data.getAttribute("id");
 
+	
+	
+	
 	$.getJSON("http://localhost:8012/stream/"+streamname+"/words?top=20", function(data, status){
 		
  	    update_cloud(data["result"]);
@@ -278,7 +285,18 @@ div#fotos{
 
 <h1>My Mash-up</h1>
 <!--Hidden form for creating new buttons -->
-<div id="form-container">
+<div class="container"><br>
+
+<input id="query" placeholder="..tu consulta aquí">
+<button onclick="getBabelNetData()">Go</button>
+<div id="labelarea"></div>
+<div id="fieldsarea"></div>
+<button id="btnGenerator" style="display:none" onclick="getObject()">Generate JSON-LD</button><br>
+
+</div>
+
+
+<div id="form-container" style="display:none">
 	<label for="name" width="20%">New stream:</label>
 	<input id="name" width="70%" type="text" placeholder=".. stream name"/>
 	<button id="create" width="10%">Create</button>

@@ -75,12 +75,12 @@ app.post('/stream', function(req, res){
 		console.log("hay body");
 		
 
-		var name= req.body["name"];
+		var name= req.body["@id"];
+		
 		// Creamos el dataset que le enviamos por post
-		DB.createDataset(name, {'name':name});
+		DB.createDataset(name,req.body);
 		
 		twit.get('search/tweets.json',{q:req.body["query"]},function(error,data,status){
-			console.log(util.inspect(data));
 
 
 			for(idx in data.statuses){
@@ -97,17 +97,13 @@ app.post('/stream', function(req, res){
 					coordenadas=tweet.coordinates.coordinates;
 				}
 				*/
-				console.log("+++++++");
 				
 				
 				if (tweet.place ===null) {
 					lugar= "unknown";
-					console.log("Lugar: desconocido");
 				}else{
 					lugar = tweet.place.bounding_box.coordinates;
-					console.log("Lugar: "+tweet.place.bounding_box.coordinates);
 				}
-				console.log("+++++++");
 				
 				coordenadas=null;
 				lugar="a";

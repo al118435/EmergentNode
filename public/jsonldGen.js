@@ -62,6 +62,14 @@ function getObject(){
         }
     }
 	 newdata=$("#id").val();
+	 
+
+
+	  
+	 
+	 
+	 
+	 
 	 //create new button for new stream
 	 $.post("http://localhost:8012/stream", obj,  function(status, data){
 		addButton(newdata);

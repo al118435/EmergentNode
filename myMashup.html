@@ -90,6 +90,11 @@ div#fotos{
 	var obj=null;
 	   //initial list of buttons (streams)
 	   
+	   //
+	   //Aqui hacemos llamada a metodo de myServer para obtener el get de
+	   //mongoDB de los jsonLD que meteremos en el <script> vacio
+	   
+	  
 	      
 	   //button for creating new streams
 	   $("#streamlist").append("<button id='NEW' width='1%'><b>+</b></button>");
@@ -281,7 +286,7 @@ div#fotos{
 
 </script>
 
-<body>
+<body> <script id="microdata" type="ld+json"></script>
 
 <h1>My Mash-up</h1>
 <!--Hidden form for creating new buttons -->

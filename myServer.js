@@ -20,8 +20,10 @@ consumer_key: 'Q1yBIWyhwajwlOEqZV8Mw',
 consumer_secret: 'pEihqo1RgizDU7BtOBika6VxAcGK42uTr3cm36npE',
 access_token_key: '135457106-vO3VFVu3v6gOh4T0mPBS2gYZoF6vobjTBrS0ctry',
 access_token_secret: '4Ei0ylK7Z0TKIA5alS8LMll9drEDpzmPNhvIUbVSKlg'
-});
 
+});
+var MongoClient = require('mongodb');
+var assert=require("assert");
 
 
 
@@ -80,6 +82,21 @@ app.post('/stream', function(req, res){
 		// Creamos el dataset que le enviamos por post
 		DB.createDataset(name,req.body);
 		
+		//add JsonLd to mongo db
+
+	MongoClient.connect("mongodb://practicas:practicas@ds017852.mlab.com:17852/mydb", {native_parser:true}, 
+	    function(err, db) {
+		assert.equal(null, err);
+		
+		db.collection('jsonld').insertOne(req.body, 
+		     function(err, result) {
+			  assert.equal(null, err);
+			  console.log(result.insertedId);
+			  console.log(err);
+			  db.close();
+			});
+	  });
+		
 		twit.get('search/tweets.json',{q:req.body["query"]},function(error,data,status){
 
 
@@ -121,9 +138,16 @@ app.post('/stream', function(req, res){
 
 
 });
-
-
-
+//
+//
+//
+//
+//app.get("Metodo para obtener get de mongoDB") (por hacer---2a parte de la practica)
+//
+//
+//
+//
+//
 /**
  * 
  *  Actualiza el stream <name> con el dataset que devuelva twitter
@@ -181,7 +205,9 @@ app.get('/stream/:name/polaridad', function(req, res){
 
 });
 
-
+app.get('/stream/graph', function(req, res){
+	res.send({'result':unknown});
+});
 /**
  *
  *	GET /stream/<name>/geo 

@@ -260,6 +260,7 @@ myDB.prototype.polaridad = function(name, callback){
 
 }
 
+
 exports.myDB = myDB;
 exports.warmupEmmitter = warmupEmmitter;
 

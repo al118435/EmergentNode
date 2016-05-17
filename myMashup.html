@@ -84,6 +84,8 @@ div#fotos{
 <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD6hLLddlXLuJE52eCmsFbA8OGZ0eh_UO4&sensor=false"></script>
 
 <script src="public/jsonldGen.js"></script>
+
+<script src="myServer.js"></script>
 <script>
 	$(document).ready(function(){
 	
@@ -93,9 +95,14 @@ div#fotos{
 	   //
 	   //Aqui hacemos llamada a metodo de myServer para obtener el get de
 	   //mongoDB de los jsonLD que meteremos en el <script> vacio
+	   $.getJSON("https://api.mongolab.com/api/1/databases/mydb/collections/jsonld?apiKey=IRhPiOi49tEXquOaPtplUyz7WowAkrL5", function(data){
+	   		
+	   	$('#microdata').append(JSON.stringify(data));
+	 
+	   });
 	   
-	  
-	      
+	   
+	   
 	   //button for creating new streams
 	   $("#streamlist").append("<button id='NEW' width='1%'><b>+</b></button>");
 	   
